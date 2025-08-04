@@ -1,0 +1,133 @@
+AI L2 Assignment (EPMS) - PROMPTS
+=============================================================================================================
+
+The Application goal is Employee Performance Management System
+
+Business Context: The HR department needs to streamline performance reviews and goal tracking of Employee
+
+Main Core Requirements :
+
+Employee Profiles: Employee Personal info, role details, reporting structure
+Goal Setting: Quarterly/annual goals with progress tracking
+Performance Reviews: 360-degree feedback and evaluation forms
+Skill Assessment: Track competencies and development areas
+Reports & Analytics: Performance trends, goal achievement rates
+
+Technical Stack: Angular frontend, Python backend, PostgreSQL database
+
+
+-
+Would like to add the following
+
+Add CRUD endpoints for goals, reviews, or skills next
+Scaffold authentication (login, roles)
+
+-
+Basic authentication (register, login, protect endpoints)?
+Or do you want to specify user roles (employee, manager, HR) and restrict certain endpoints by role from the start?
+
+-
+Apply similar protection to other routers (e.g., only managers/HR can create reviews, only employees can update their own goals, etc.).
+Test the /auth/register, /auth/login, and protected endpoints using a tool like Postman.
+
+-
+Need Sample Postman Collections for testing 
+
+-
+Implement the other service files (employee, goal, review, skill, report) with API methods
+Set up routing and guards for protected routes
+Build out the component templates and logic for CRUD operations and dashboards
+
+
+Access the Application
+
+Open your browser and go to: http://localhost:4200
+Register a new user at: http://localhost:4200/auth/register
+Login at: http://localhost:4200/auth/login
+Access the dashboard at: http://localhost:4200/reports/dashboard
+
+
+Home/Employees	http://localhost:4200/employees
+Goals	http://localhost:4200/goals
+Reviews	http://localhost:4200/reviews
+Skills	http://localhost:4200/skills
+Reports/Dashboard	http://localhost:4200/reports/dashboard
+Login	http://localhost:4200/auth/login
+Register	http://localhost:4200/auth/register
+
+
+Testing with Postman
+
+We can also test the backend API directly using the Postman collection Which provided earlier:
+Backend API: http://localhost:8000
+Register: POST http://localhost:8000/auth/register
+Login: POST http://localhost:8000/auth/login
+
+
+
+
+-
+Postgresql SQL table schemas to create the tables for this application
+
+-- USERS TABLE
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    hashed_password VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL DEFAULT 'employee', -- employee, manager, HR
+    is_active BOOLEAN DEFAULT TRUE
+);
+
+-- EMPLOYEES TABLE
+CREATE TABLE employees (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    role VARCHAR(255) NOT NULL,
+    department VARCHAR(255),
+    manager_id INTEGER REFERENCES employees(id) ON DELETE SET NULL
+);
+
+-- GOALS TABLE
+CREATE TABLE goals (
+    id SERIAL PRIMARY KEY,
+    employee_id INTEGER NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    start_date DATE,
+    end_date DATE,
+    status VARCHAR(50),
+    progress FLOAT DEFAULT 0.0
+);
+
+-- REVIEWS TABLE
+CREATE TABLE reviews (
+    id SERIAL PRIMARY KEY,
+    employee_id INTEGER NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
+    reviewer_id INTEGER NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
+    period VARCHAR(100),
+    feedback TEXT,
+    rating FLOAT,
+    type VARCHAR(50) -- self, peer, manager
+);
+
+-- SKILLS TABLE
+CREATE TABLE skills (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) UNIQUE NOT NULL,
+    description TEXT
+);
+
+-- EMPLOYEE_SKILLS TABLE
+CREATE TABLE employee_skills (
+    id SERIAL PRIMARY KEY,
+    employee_id INTEGER NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
+    skill_id INTEGER NOT NULL REFERENCES skills(id) ON DELETE CASCADE,
+    level VARCHAR(50),
+    last_assessed DATE
+);
+
+
+
+
